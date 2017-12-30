@@ -1,8 +1,19 @@
 pipeline {
     agent any
+
     tools {
         maven 'localMaven'
     }
+
+    parameters {
+         string(name: 'tomcat_dev', defaultValue: '10.0.15.40', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '10.0.15.50', description: 'Production Server')
+    }
+
+    triggers {
+         pollSCM('* * * * *')
+     }
+
     stages {
         stage('Build') {
             steps {
@@ -16,27 +27,18 @@ pipeline {
             }
         }
 
-        stage ('Deploy to Staging'){
-            steps {
-                build job: 'hello-app-deploy-to-stage'
-            }
-        }
-
-        stage ('Deploy to Production'){
-            steps{
-                timeout(time:5, unit:'DAYS'){
-                    input message:'Approve PRODUCTION Deployment?'
+        stage ('Deployments'){
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        sh "scp **/target/*.war root@${params.tomcat_dev}:/var/lib/tomcat8/webapps"
+                    }
                 }
 
-                build job: 'hello-app-deploy-to-prod'
-            }
-            post {
-                success {
-                    echo 'Code deployed to Production.'
-                }
-
-                failure {
-                    echo ' Deployment failed.'
+                stage ("Deploy to Production"){
+                    steps {
+                        sh "scp **/target/*.war root@${params.tomcat_prod}:/var/lib/tomcat8/webapps"
+                    }
                 }
             }
         }
