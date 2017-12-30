@@ -1,1 +1,1 @@
-Hello, World! Jenkinsfile V6
+Hello, World! Jenkinsfile V1: Full Auto
