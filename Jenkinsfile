@@ -16,12 +16,12 @@ pipeline {
             }
         }
 
-        // stage ('Deploy to Staging'){
-        //     steps {
-        //         build job: 'hello-app-deploy-to-stage'
-        //     }
-        // }
-        //
+        stage ('Deploy to Staging'){
+            steps {
+                build job: 'hello-app-deploy-to-stage'
+            }
+        }
+
         // stage ('Deploy to Production'){
         //     steps{
         //         timeout(time:5, unit:'DAYS'){
